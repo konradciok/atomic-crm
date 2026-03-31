@@ -1,9 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { useRedirect, RecordContextProvider } from "ra-core";
 import { ReferenceField } from "@/components/admin/reference-field";
-import { NumberField } from "@/components/admin/number-field";
-import { SelectField } from "@/components/admin/select-field";
-import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { useConfigurationContext } from "../root/ConfigurationContext";
@@ -30,8 +28,11 @@ export const DealCardContent = ({
   snapshot?: any;
   deal: Deal;
 }) => {
-  const { dealCategories, currency } = useConfigurationContext();
+  const { dealCategories } = useConfigurationContext();
   const redirect = useRedirect();
+  const categoryLabel = deal.category
+    ? dealCategories.find((category) => category.value === deal.category)?.label
+    : null;
   const handleClick = () => {
     redirect(`/deals/${deal.id}/show`, undefined, undefined, undefined, {
       _scrollToTop: false,
@@ -47,53 +48,56 @@ export const DealCardContent = ({
       onClick={handleClick}
     >
       <RecordContextProvider value={deal}>
-        <Card
-          className={`py-3 transition-all duration-200 ${
+        <article
+          className={cn(
+            "rounded-[1.05rem] border border-white/80 bg-background/96 p-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-all duration-200 dark:border-white/5 dark:bg-background/95",
             snapshot?.isDragging
-              ? "opacity-90 transform rotate-1 shadow-lg"
-              : "shadow-sm hover:shadow-md"
-          }`}
+              ? "rotate-[0.8deg] border-border shadow-[0_14px_30px_rgba(15,23,42,0.14)]"
+              : "hover:-translate-y-0.5 hover:border-border/80 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]",
+          )}
         >
-          <CardContent className="px-3 flex flex-col">
-            <div className="flex-1 flex">
-              <p className="flex-1 text-sm font-medium mb-2">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/85">
+                  <ReferenceField
+                    source="company_id"
+                    reference="companies"
+                    link={false}
+                  />
+                </div>
+                <p className="mt-1.5 text-[13px] font-semibold leading-5 text-foreground">
+                  {deal.name}
+                </p>
+              </div>
+              <div className="shrink-0 pt-0.5 opacity-80">
                 <ReferenceField
                   source="company_id"
                   reference="companies"
                   link={false}
-                />
-                {" - "}
-                {deal.name}
-              </p>
-              <ReferenceField
-                source="company_id"
-                reference="companies"
-                link={false}
-              >
-                <CompanyAvatar width={20} height={20} />
-              </ReferenceField>
+                >
+                  <CompanyAvatar width={22} height={22} />
+                </ReferenceField>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              <NumberField
-                source="amount"
-                options={{
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-[12px] font-semibold text-foreground">
+                {deal.amount.toLocaleString("en-US", {
                   notation: "compact",
                   style: "currency",
-                  currency,
+                  currency: "USD",
                   currencyDisplay: "narrowSymbol",
                   minimumSignificantDigits: 3,
-                }}
-              />
-              {deal.category && ", "}
-              <SelectField
-                source="category"
-                choices={dealCategories}
-                optionText="label"
-                optionValue="value"
-              />
-            </p>
-          </CardContent>
-        </Card>
+                })}
+              </span>
+              {categoryLabel ? (
+                <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+                  {categoryLabel}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </article>
       </RecordContextProvider>
     </div>
   );

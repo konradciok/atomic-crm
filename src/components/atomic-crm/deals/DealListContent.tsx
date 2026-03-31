@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { DealColumn } from "./DealColumn";
+import { getDealStageTone } from "./dealBoardTheme";
 import type { DealsByStage } from "./stages";
 import { getDealsByStage } from "./stages";
 
@@ -72,14 +73,32 @@ export const DealListContent = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-4">
-        {dealStages.map((stage) => (
-          <DealColumn
-            stage={stage.value}
-            deals={dealsByStage[stage.value]}
-            key={stage.value}
-          />
-        ))}
+      <div className="rounded-[2rem] border border-border/70 bg-[linear-gradient(180deg,rgba(250,250,250,0.96),rgba(244,244,245,0.9))] p-4 shadow-sm dark:bg-[linear-gradient(180deg,rgba(24,24,27,0.98),rgba(17,17,19,0.96))]">
+        <div className="mb-4 flex items-center justify-between gap-3 px-1">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              Deals pipeline
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Drag deals across stages to keep the pipeline current.
+            </p>
+          </div>
+          <div className="hidden text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground lg:block">
+            {unorderedDeals?.length ?? 0} open deals
+          </div>
+        </div>
+        <div className="-mx-1 overflow-x-auto px-1 pb-2">
+          <div className="flex min-w-max items-start gap-5">
+            {dealStages.map((stage) => (
+              <DealColumn
+                stage={stage.value}
+                deals={dealsByStage[stage.value]}
+                key={stage.value}
+                tone={getDealStageTone(stage.value)}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </DragDropContext>
   );

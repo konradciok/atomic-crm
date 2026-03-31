@@ -1,15 +1,18 @@
 import type { ReactNode } from "react";
 import type { InputProps } from "ra-core";
 import { useGetIdentity, useListContext, useTranslate } from "ra-core";
-import { matchPath, useLocation } from "react-router";
+import { buttonVariants } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { matchPath, useLocation } from "react-router-dom";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
-import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { FilterButton } from "@/components/admin/filter-form";
 import { SearchInput } from "@/components/admin/search-input";
 import { SelectInput } from "@/components/admin/select-input";
+import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { TopToolbar } from "../layout/TopToolbar";
@@ -29,11 +32,16 @@ const DealList = () => {
   if (!identity) return null;
 
   const dealFilters = [
-    <SearchInput source="q" alwaysOn />,
+    <SearchInput
+      source="q"
+      alwaysOn
+      className="min-w-56 [&_[data-slot=input]]:h-10 [&_[data-slot=input]]:rounded-full [&_[data-slot=input]]:border-border/70 [&_[data-slot=input]]:bg-background/85 [&_[data-slot=input]]:pl-3 [&_[data-slot=input]]:shadow-sm"
+    />,
     <ReferenceInput source="company_id" reference="companies">
       <AutocompleteInput
         label={false}
         placeholder={translate("resources.deals.fields.company_id")}
+        className="min-w-52 [&_[data-slot=button]]:h-10 [&_[data-slot=button]]:rounded-full [&_[data-slot=button]]:border-border/70 [&_[data-slot=button]]:bg-background/85 [&_[data-slot=button]]:px-3 [&_[data-slot=button]]:shadow-sm"
       />
     </ReferenceInput>,
     <WrapperField source="category" label="resources.deals.fields.category">
@@ -44,9 +52,10 @@ const DealList = () => {
         choices={dealCategories}
         optionText="label"
         optionValue="value"
+        className="min-w-44 [&_[data-slot=select-trigger]]:h-10 [&_[data-slot=select-trigger]]:rounded-full [&_[data-slot=select-trigger]]:border-border/70 [&_[data-slot=select-trigger]]:bg-background/85 [&_[data-slot=select-trigger]]:px-3 [&_[data-slot=select-trigger]]:shadow-sm"
       />
     </WrapperField>,
-    <OnlyMineInput source="sales_id" alwaysOn />,
+    <OnlyMineInput source="sales_id" alwaysOn className="min-w-fit" />,
   ];
 
   return (
@@ -58,6 +67,7 @@ const DealList = () => {
       filters={dealFilters}
       actions={<DealActions />}
       pagination={null}
+      className="mt-4"
     >
       <DealLayout />
     </List>
@@ -96,10 +106,23 @@ const DealLayout = () => {
 };
 
 const DealActions = () => (
-  <TopToolbar>
-    <FilterButton />
-    <ExportButton />
-    <CreateButton label="resources.deals.action.new" />
+    <TopToolbar className="rounded-full border border-border/70 bg-background/85 px-2 py-2 shadow-sm backdrop-blur-sm">
+      <FilterButton
+        variant="ghost"
+        className="rounded-full text-sm font-medium text-muted-foreground hover:text-foreground"
+        size="sm"
+      />
+    <ExportButton className="rounded-full border-0 bg-transparent text-sm font-medium text-muted-foreground shadow-none hover:bg-muted hover:text-foreground" />
+    <Link
+      className={cn(
+        buttonVariants({ variant: "default" }),
+        "rounded-full bg-foreground px-4 text-sm text-background shadow-sm hover:bg-foreground/90",
+      )}
+      to="/deals/create"
+    >
+      <Plus className="h-4 w-4" />
+      New Deal
+    </Link>
   </TopToolbar>
 );
 
